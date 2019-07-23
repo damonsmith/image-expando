@@ -25,7 +25,7 @@ fn main() {
 
     println!("will resize {} pixels per frame", resize_pixels_per_frame);
 
-    let mut gif_output = File::create("target/output.gif").unwrap();
+    let mut gif_output = File::create("output.gif").unwrap();
     let mut encoder = Encoder::new(&mut gif_output, _src_image.width as u16, _src_image.height as u16, &[]).unwrap();
     encoder.set(Repeat::Infinite).unwrap();
 
