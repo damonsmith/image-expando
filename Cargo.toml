@@ -1,0 +1,11 @@
+[package]
+
+name = "memer"
+version = "0.0.1"
+authors = [ "Damon Smith <damon.smith@sportsbet.com.au>" ]
+
+[dependencies]
+
+raster = "0.2.0"
+clap = "2.31.2"
+gif = "0.10.2"
