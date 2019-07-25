@@ -49,6 +49,6 @@ fn main() {
         }));
     }
     for handle in handles {
-        handle.join().unwrap();
+        handle.join();
     }
 }
