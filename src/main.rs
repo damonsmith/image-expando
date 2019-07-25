@@ -6,6 +6,11 @@ use raster::{transform, editor, BlendMode, PositionMode};
 use gif::{Frame, Encoder, Repeat, SetParameter};
 use std::fs::File;
 use std::thread;
+
+struct FrameHolder {
+    frame: Frame
+}
+
 fn main() {
 
     let frame_count = 12;
@@ -23,10 +28,10 @@ fn main() {
     encoder.set(Repeat::Infinite).unwrap();
 
     let mut handles = Vec::with_capacity(frame_count as usize);
-    //let mut frames = Vec::with_capacity(frame_count as usize);
+    let mut frames: Vec<FrameHolder> = Vec::with_capacity(frame_count as usize);
 
-    for i in 0..frame_count {
-        
+    for (index, _chunk) in frames.chunks_mut(1).enumerate() {
+        let i: i32 = index as i32;
         let mut _outer_image = _src_image.clone();
         let mut _inner_image = _src_image.clone();
         let mut _center_image = _src_image.clone();
@@ -34,26 +39,16 @@ fn main() {
         let height = _src_image.height;
 
         handles.push(thread::spawn(move || {
-            println!("spawned thread {}!", i);
-            
             transform::resize_exact_height(&mut _inner_image, i*resize_pixels_per_frame).unwrap();
             transform::resize_exact_height(&mut _center_image, height + i*resize_pixels_per_frame).unwrap();
             transform::resize_exact_height(&mut _outer_image, (height*2) + i*resize_pixels_per_frame).unwrap();
-        
             let mut overlay = editor::blend(&_outer_image, &_center_image, BlendMode::Normal, 1.0, PositionMode::Center, 0, 0).unwrap();
             overlay = editor::blend(&overlay, &_inner_image, BlendMode::Normal, 1.0, PositionMode::Center, 0, 0).unwrap();
-        
             editor::crop(&mut overlay, width, height, PositionMode::Center, 0, 0).unwrap();
-        
-            let _frame = Frame::from_rgba(width as u16, height as u16, overlay.bytes.as_mut_slice());
-            //frames.insert(i as usize, _frame);
-            println!("thread {} waiting on barrier", i);
+            chunk.iter().next().frame = Frame::from_rgba(width as u16, height as u16, overlay.bytes.as_mut_slice());
         }));
     }
-
     for handle in handles {
         handle.join().unwrap();
     }
-    println!("all threads finished");
-    //encoder.write_frame(&_frame).unwrap();
 }
