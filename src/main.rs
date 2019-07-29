@@ -5,8 +5,16 @@ use std::env;
 use raster::{transform, editor, BlendMode, PositionMode};
 use gif::{Frame, Encoder, Repeat, SetParameter};
 use std::fs::File;
+use std::thread;
 
+const NUMTHREADS: usize = 4;
 const FRAME_COUNT: usize = 12;
+
+struct FrameHolder<'a> {
+    frame_number: i32,
+    frame: Option<Frame<'a>>
+}
+
 
 fn main() {
 
@@ -18,14 +26,21 @@ fn main() {
     let mut encoder = Encoder::new(&mut gif_output, _src_image.width as u16, _src_image.height as u16, &[]).unwrap();
     encoder.set(Repeat::Infinite).unwrap();
 
-    let frame_numbers: Vec<i32> = (0..FRAME_COUNT as i32).collect();
-
-    let frames: Vec<Frame> = frame_numbers.iter().map(|frame_number| {
-        return generate_gif_frame(&_src_image, frame_number);
-    }).collect();
+    let mut frame_numbers: Vec<i32> = (0..FRAME_COUNT as i32).collect();
+    let chunks = frame_numbers.chunks_mut(FRAME_COUNT / NUMTHREADS);
     
-    for frame in frames {
-        encoder.write_frame(&frame).unwrap();
+    let mut children = vec![];
+
+    // Divide the set of frames up into a chunk of frames for each thread
+    for chunk in chunks {
+        
+        let src = _src_image.clone();
+        children.push(thread::spawn(move || {
+            let frames: Vec<Frame> = chunk.iter().map(|frame_number| {
+                return generate_gif_frame(&src, frame_number);
+            }).collect();
+            return frames;
+        }));
     }
 }
 
