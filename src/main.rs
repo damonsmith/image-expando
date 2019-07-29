@@ -20,8 +20,11 @@ fn main() {
 
     let frame_numbers: Vec<i32> = (0..FRAME_COUNT as i32).collect();
 
-    let src = _src_image.clone();
-    for frame in frame_numbers.iter().map(|frame_number| generate_gif_frame(&src, frame_number)) {
+    let frames: Vec<Frame> = frame_numbers.iter().map(|frame_number| {
+        return generate_gif_frame(&_src_image, frame_number);
+    }).collect();
+    
+    for frame in frames {
         encoder.write_frame(&frame).unwrap();
     }
 }
