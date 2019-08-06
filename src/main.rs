@@ -42,7 +42,7 @@ fn main() {
 					return generate_gif_frame(&src, frame_number);
 				})
 				.collect();
-			return frames;
+			frames
 		}));
 	}
 
@@ -87,5 +87,5 @@ fn generate_gif_frame<'a>(src: &raster::Image, frame_number: &i32) -> Frame<'a> 
 	.unwrap();
 	editor::crop(&mut overlay, width, height, PositionMode::Center, 0, 0).unwrap();
 	println!("generated gif frame: {}", frame_number);
-	return Frame::from_rgba(width as u16, height as u16, overlay.bytes.as_mut_slice());
+	Frame::from_rgba(width as u16, height as u16, overlay.bytes.as_mut_slice())
 }
