@@ -1,7 +1,7 @@
 extern crate clap;
 extern crate gif;
 extern crate raster;
-use gif::{Encoder, Frame, Repeat, SetParameter};
+use gif::{Encoder, Frame, Repeat};
 use raster::{editor, transform, BlendMode, PositionMode};
 use std::env;
 use std::fs::File;
@@ -23,7 +23,7 @@ fn main() {
 		&[],
 	)
 	.unwrap();
-	encoder.set(Repeat::Infinite).unwrap();
+	encoder.set_repeat(Repeat::Infinite).unwrap();
 
 	let mut frame_numbers: Vec<i32> = (0..FRAME_COUNT as i32).collect();
 	let chunks = frame_numbers.chunks_mut(FRAME_COUNT / NUMTHREADS);
